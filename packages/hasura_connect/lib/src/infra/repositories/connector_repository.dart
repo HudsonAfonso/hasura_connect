@@ -1,10 +1,11 @@
 import 'package:either_dart/either.dart';
-import 'package:hasura_connect/src/domain/entities/connector.dart';
-import 'package:hasura_connect/src/domain/errors/errors.dart';
-import 'package:hasura_connect/src/domain/models/query.dart';
-import 'package:hasura_connect/src/domain/models/request.dart';
-import 'package:hasura_connect/src/domain/repositories/connector_repository.dart';
-import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
+
+import '../../domain/entities/connector.dart';
+import '../../domain/errors/errors.dart';
+import '../../domain/models/query.dart';
+import '../../domain/models/request.dart';
+import '../../domain/repositories/connector_repository.dart';
+import '../datasources/connector_datasource.dart';
 
 ///Class [ConnectorRepositoryImpl] implements the interface
 ///[ConnectorRepository]

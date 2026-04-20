@@ -1,7 +1,8 @@
-import 'package:dart_websocket/websocket.dart';
-import 'package:hasura_connect/hasura_connect.dart';
-import 'package:hasura_connect/src/domain/entities/connector.dart';
-import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
+import '../../hasura_connect.dart';
+import '../domain/entities/connector.dart';
+import '../infra/datasources/connector_datasource.dart';
 
 ///Class [WebsocketConnector] implements the interface [ConnectorDatasource]
 ///implements the method [websocketConnector]
@@ -19,14 +20,13 @@ class WebsocketConnector implements ConnectorDatasource {
   Future<Connector> websocketConnector(String url) async {
     try {
       final _wrapper = wrapper ?? _WebSocketWrapper();
-      final _channelPromisse = await _wrapper
-          .connect(url.replaceFirst('https', 'wss').replaceFirst('http', 'ws'));
+      final _channelPromisse = await _wrapper.connect(url.replaceFirst('https', 'wss').replaceFirst('http', 'ws'));
       return Connector(
         _channelPromisse.stream,
-        add: _channelPromisse.addUtf8Text,
-        close: _channelPromisse.close,
+        add: _channelPromisse.sink.add,
+        close: _channelPromisse.sink.close,
         closeCodeFunction: () => _channelPromisse.closeCode ?? -1,
-        done: _channelPromisse.done,
+        done: _channelPromisse.sink.done,
       );
     } catch (e) {
       throw ConnectionError(
@@ -44,15 +44,12 @@ class WebsocketConnector implements ConnectorDatasource {
 ///an interface.
 abstract class WebSocketWrapper {
   ///Method [connect] signature
-  Future<WebSocket> connect(String url);
+  Future<WebSocketChannel> connect(String url);
 }
 
 class _WebSocketWrapper implements WebSocketWrapper {
   @override
-  Future<WebSocket> connect(String url) {
-    return WebSocket.connect(
-      url,
-      protocols: ['graphql-ws'],
-    );
+  Future<WebSocketChannel> connect(String url) async {
+    return WebSocketChannel.connect(Uri.parse(url), protocols: ['graphql-ws']);
   }
 }

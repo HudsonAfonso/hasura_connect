@@ -1,7 +1,10 @@
-import 'package:hasura_connect/hasura_connect.dart';
-import 'package:hasura_connect/src/domain/models/extensions.dart';
+import '../../../hasura_connect.dart';
+import '../models/extensions.dart';
 
-final _request = Request(url: '', query: const Query(document: ''));
+final _request = Request(
+  url: '',
+  query: const Query(document: ''),
+);
 
 ///Abstract class [HasuraError] implements [Exception]
 ///interface for Hasura related errors.
@@ -30,11 +33,11 @@ class HasuraRequestError extends HasuraError {
 
   ///[HasuraRequestError] constructor
   const HasuraRequestError(
-    String message,
+    super.message,
     this.extensions, {
+    required super.request,
     this.exception,
-    required Request request,
-  }) : super(message, request: request);
+  });
 
   ///Method [HasuraRequestError.fromException]
   ///receives the [message], exception and [request] of an Exception error.
@@ -42,27 +45,23 @@ class HasuraRequestError extends HasuraError {
     String message,
     Exception? _exception, {
     required Request request,
-  }) =>
-      HasuraRequestError(
-        message,
-        null,
-        exception: _exception,
-        request: request,
-      );
+  }) => HasuraRequestError(
+    message,
+    null,
+    exception: _exception,
+    request: request,
+  );
 
   ///Object [HasuraRequestError.fromJson]
   ///Receives a [json] and a required [request]
   ///Converts the error received in json format to a [HasuraRequestError]
   ///Overrides [toString] as a HasuraRequestError error with the message
   ///received
-  factory HasuraRequestError.fromJson(Map json, {required Request request}) =>
-      HasuraRequestError(
-        json['message'] ?? '',
-        json['extensions'] == null
-            ? null
-            : Extensions.fromJson(json['extensions']),
-        request: request,
-      );
+  factory HasuraRequestError.fromJson(Map json, {required Request request}) => HasuraRequestError(
+    json['message'] ?? '',
+    json['extensions'] == null ? null : Extensions.fromJson(json['extensions']),
+    request: request,
+  );
 
   @override
   String toString() => 'HasuraRequestError: $message';
@@ -74,8 +73,7 @@ class HasuraRequestError extends HasuraError {
 ///received
 class DatasourceError extends HasuraError {
   ///[DatasourceError] constructor
-  DatasourceError(String message, {required Request request})
-      : super(message, request: request);
+  DatasourceError(super.message, {required super.request});
   @override
   String toString() => 'DatasourceError: $message';
 }
@@ -87,7 +85,7 @@ class DatasourceError extends HasuraError {
 class InvalidRequestError extends HasuraError {
   ///[InvalidRequestError] constructor
 
-  InvalidRequestError(String message) : super(message, request: _request);
+  InvalidRequestError(super.message) : super(request: _request);
 
   @override
   String toString() => 'InvalidRequestError: $message';
@@ -100,8 +98,7 @@ class InvalidRequestError extends HasuraError {
 class ConnectionError extends HasuraError {
   ///[ConnectionError] constructor
 
-  const ConnectionError(String message, {required Request request})
-      : super(message, request: request);
+  const ConnectionError(super.message, {required super.request});
 
   @override
   String toString() => 'ConnectionError: $message';
@@ -114,7 +111,7 @@ class ConnectionError extends HasuraError {
 class InterceptorError extends HasuraError {
   ///[InterceptorError] constructor
 
-  InterceptorError(String message) : super(message, request: _request);
+  InterceptorError(super.message) : super(request: _request);
 
   @override
   String toString() => 'InterceptorError: $message';

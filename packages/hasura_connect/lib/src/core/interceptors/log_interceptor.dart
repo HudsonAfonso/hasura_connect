@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print
 
-import 'package:hasura_connect/src/core/interceptors/interceptor.dart';
-import 'package:hasura_connect/src/domain/entities/response.dart';
-import 'package:hasura_connect/src/domain/entities/snapshot.dart';
-import 'package:hasura_connect/src/domain/errors/errors.dart';
-import 'package:hasura_connect/src/domain/models/request.dart';
-import 'package:hasura_connect/src/presenter/hasura_connect_base.dart';
+import '../../domain/entities/response.dart';
+import '../../domain/entities/snapshot.dart';
+import '../../domain/errors/errors.dart';
+import '../../domain/models/request.dart';
+import '../../presenter/hasura_connect_base.dart';
+import 'interceptor.dart';
 
 ///The class [LogInterceptor] is responsible for creating a log
 ///for [onConnected], [onDisconnected] and [onTryAgain] methods

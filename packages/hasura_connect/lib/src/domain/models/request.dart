@@ -1,5 +1,6 @@
-import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:meta/meta.dart';
+
+import 'query.dart';
 
 ///Class [Request]
 /// a request object, overrides the [==] operator and the hashcode
@@ -52,10 +53,7 @@ class Request {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Request &&
-        other.url == url &&
-        other.query == query &&
-        other.type == type;
+    return other is Request && other.url == url && other.query == query && other.type == type;
   }
 
   @override

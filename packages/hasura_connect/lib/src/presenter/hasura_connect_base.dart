@@ -1,35 +1,34 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:hasura_connect/src/core/interceptors/interceptor.dart';
-import 'package:hasura_connect/src/core/interceptors/interceptor_executor.dart';
-import 'package:hasura_connect/src/core/utils/keys_generator.dart';
-import 'package:hasura_connect/src/di/injection.dart' as sl;
-import 'package:hasura_connect/src/di/module.dart';
-import 'package:hasura_connect/src/domain/entities/connector.dart';
-import 'package:hasura_connect/src/domain/entities/response.dart';
-import 'package:hasura_connect/src/domain/entities/snapshot.dart';
-import 'package:hasura_connect/src/domain/errors/errors.dart';
-import 'package:hasura_connect/src/domain/models/query.dart';
-import 'package:hasura_connect/src/domain/models/request.dart';
-import 'package:hasura_connect/src/domain/usecases/get_connector.dart';
-import 'package:hasura_connect/src/domain/usecases/get_snapshot_subscription.dart';
-import 'package:hasura_connect/src/domain/usecases/mutation_to_server.dart';
-import 'package:hasura_connect/src/domain/usecases/query_to_server.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
+
+import '../core/interceptors/interceptor.dart';
+import '../core/interceptors/interceptor_executor.dart';
+import '../core/utils/keys_generator.dart';
+import '../di/injection.dart' as sl;
+import '../di/module.dart';
+import '../domain/entities/connector.dart';
+import '../domain/entities/response.dart';
+import '../domain/entities/snapshot.dart';
+import '../domain/errors/errors.dart';
+import '../domain/models/query.dart';
+import '../domain/models/request.dart';
+import '../domain/usecases/get_connector.dart';
+import '../domain/usecases/get_snapshot_subscription.dart';
+import '../domain/usecases/mutation_to_server.dart';
+import '../domain/usecases/query_to_server.dart';
 
 ///Base Class [HasuraConnect]
 class HasuraConnect {
   @visibleForTesting
-
   /// [controller] variable receiving a StreamController.broadcast()
   final controller = StreamController.broadcast();
 
   /// [url] variable type [String]
   final String url;
   @visibleForTesting
-
   /// [snapmap] variable type [Map]
   final Map<String, Snapshot> snapmap = {};
   final KeyGenerator _keyGenerator = KeyGenerator();
@@ -38,11 +37,9 @@ class HasuraConnect {
   bool _disconnectionFlag = false;
   final _init = {
     'payload': {
-      'headers': {
-        'content-type': 'application/json'
-      }
+      'headers': {'content-type': 'application/json'},
     },
-    'type': 'connection_init'
+    'type': 'connection_init',
   };
 
   ///[isConnected] variable type [bool]
@@ -73,9 +70,12 @@ class HasuraConnect {
     startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
-    _subscription = controller.stream.where((data) => data is Map).map((data) 
-    => data as Map,).where((data) => data.containsKey('id')).where((data) 
-    => snapmap.containsKey(data['id']),).listen(rootStreamListener);
+    _subscription = controller.stream
+        .where((data) => data is Map)
+        .map((data) => data as Map)
+        .where((data) => data.containsKey('id'))
+        .where((data) => snapmap.containsKey(data['id']))
+        .listen(rootStreamListener);
   }
 
   ///Method [rootStreamListener]
@@ -113,21 +113,9 @@ class HasuraConnect {
   }
 
   ///Execute a Query from a Document
-  Future query(
-    String document, {
-    String? key,
-    Map<String, dynamic>? variables,
-    Map<String, String>? headers,
-  }) async {
+  Future query(String document, {String? key, Map<String, dynamic>? variables, Map<String, String>? headers}) async {
     final _key = key ?? _keyGenerator.generateBase(document);
-    return executeQuery(
-      Query(
-        key: _key,
-        headers: headers,
-        document: document.trimLeft(),
-        variables: variables,
-      ),
-    );
+    return executeQuery(Query(key: _key, headers: headers, document: document.trimLeft(), variables: variables));
   }
 
   ///Execute a Query
@@ -146,18 +134,11 @@ class HasuraConnect {
     }
 
     ///A request type request is created
-    var request = Request(
-      headers: _headers,
-      type: RequestType.query,
-      url: url,
-      query: query,
-    );
+    var request = Request(headers: _headers, type: RequestType.query, url: url, query: query);
 
     ///[interceptedValue] receives the value from a [ClientResolver] request
 
-    final interceptedValue = await _interceptorExecutor(
-      ClientResolver.request(request, this),
-    );
+    final interceptedValue = await _interceptorExecutor(ClientResolver.request(request, this));
 
     /// if the [interceptedValue] is a [Response], returns the interceptedValue
     /// if the [interceptedValue] is a [HasuraError], returns the interceptedValue
@@ -180,9 +161,7 @@ class HasuraConnect {
   Future<Response> _interceptError(HasuraError error) async {
     ///Receives the intercepted value from a [ClientResolver] error
 
-    final interceptedValue = await _interceptorExecutor(
-      ClientResolver.error(error, this),
-    );
+    final interceptedValue = await _interceptorExecutor(ClientResolver.error(error, this));
 
     ///if the intercepted value is a [Response], return the value
     ///else, will throw the intercepted value
@@ -196,9 +175,7 @@ class HasuraConnect {
   ///Intercepts the reponse when a [Response] occurs
   Future<Response> _interceptResponse(Response response) async {
     ///Receives the intercepted value from a [ClientResolver] response
-    final interceptedValue = await _interceptorExecutor(
-      ClientResolver.response(response, this),
-    );
+    final interceptedValue = await _interceptorExecutor(ClientResolver.response(response, this));
 
     ///if the intercept value is a [Response], returns the intercepted value
     ///else, throws the intercepted value
@@ -219,14 +196,7 @@ class HasuraConnect {
   }) async {
     final _key = key ?? _keyGenerator.randomString(15);
 
-    return executeMutation(
-      Query(
-        key: _key,
-        headers: headers,
-        document: document.trimLeft(),
-        variables: variables,
-      ),
-    );
+    return executeMutation(Query(key: _key, headers: headers, document: document.trimLeft(), variables: variables));
   }
 
   ///Execute a Mutation from a Query
@@ -243,17 +213,10 @@ class HasuraConnect {
     }
 
     ///Creates a request type mutation
-    var request = Request(
-      headers: _headers,
-      type: RequestType.mutation,
-      url: url,
-      query: query,
-    );
+    var request = Request(headers: _headers, type: RequestType.mutation, url: url, query: query);
 
     ///Interceptor execute a client resolver request
-    final interceptedValue = await _interceptorExecutor(
-      ClientResolver.request(request, this),
-    );
+    final interceptedValue = await _interceptorExecutor(ClientResolver.request(request, this));
 
     ///if the intercepted value is a response, returns the intercepted value
     ///if intercepted value is a [HasuraError], throws the intercepted value
@@ -283,14 +246,7 @@ class HasuraConnect {
     final _document = document.trim();
     final _key = key ?? _keyGenerator.generateBase(document);
 
-    return executeSubscription(
-      Query(
-        key: _key,
-        headers: headers,
-        document: _document,
-        variables: variables,
-      ),
-    );
+    return executeSubscription(Query(key: _key, headers: headers, document: _document, variables: variables));
   }
 
   ///Execute a Subscription from a Query
@@ -307,18 +263,10 @@ class HasuraConnect {
       final usecase = sl.get<GetSnapshotSubscription>();
 
       ///creates a request type subscription
-      final request = Request(
-        url: url,
-        type: RequestType.subscription,
-        query: query,
-      );
+      final request = Request(url: url, type: RequestType.subscription, query: query);
 
       ///Receives the resulto from usecase
-      final result = usecase(
-        closeConnection: _removeSnapshot,
-        changeVariables: _changeVariables,
-        request: request,
-      );
+      final result = usecase(closeConnection: _removeSnapshot, changeVariables: _changeVariables, request: request);
 
       ///The snapshot receives either the error or the snapshot
       snapshot = result.fold((l) => throw l, (s) => s);
@@ -348,10 +296,7 @@ class HasuraConnect {
 
   ///Removes the snapshot
   void _removeSnapshot(Snapshot snapshot) {
-    final stop = {
-      'id': snapshot.query.key,
-      'type': 'stop'
-    };
+    final stop = {'id': snapshot.query.key, 'type': 'stop'};
 
     ///removes the snapshot from [snapmap]
     snapmap.remove(snapshot.query.key);
@@ -364,10 +309,7 @@ class HasuraConnect {
 
   ///Change the variables in a snapshot
   Future _changeVariables(Snapshot snapshot) async {
-    final stop = {
-      'id': snapshot.query.key,
-      'type': 'stop'
-    };
+    final stop = {'id': snapshot.query.key, 'type': 'stop'};
 
     ///if connected, send to the web socketw server a stop request as json
     ///is connected, send to the web socketw server a query subscription with
@@ -436,9 +378,7 @@ class HasuraConnect {
       query: const Query(key: 'key', document: 'document'),
     );
 
-    final interceptedValue = await _interceptorExecutor(
-      ClientResolver.request(request, this),
-    );
+    final interceptedValue = await _interceptorExecutor(ClientResolver.request(request, this));
 
     try {
       ///if the intercepted value is a [Request], add to the request
@@ -453,11 +393,8 @@ class HasuraConnect {
       ///Send a map with the payload value to init the web socket server
       final subscriptionStream =
           // ignore: unnecessary_lambdas
+          connector.map<Map>((data) => jsonDecode(data)).listen(normalizeStreamValue);
 
-          connector
-              .map<Map>((data) => jsonDecode(data))
-              .listen(normalizeStreamValue);
-              
       (_init['payload']! as Map)['headers'] = request.headers;
       sendToWebSocketServer(jsonEncode(_init));
       // ignore: avoid_print
@@ -494,11 +431,8 @@ class HasuraConnect {
   String querySubscription(Query query) {
     return jsonEncode({
       'id': query.key,
-      'payload': {
-        'query': query.document,
-        'variables': query.variables,
-      },
-      'type': 'start'
+      'payload': {'query': query.document, 'variables': query.variables},
+      'type': 'start',
     });
   }
 
@@ -534,9 +468,7 @@ class HasuraConnect {
       snapmap[key]?.close();
     }
     snapmap.clear();
-    final disconect = {
-      'type': 'connection_terminate'
-    };
+    final disconect = {'type': 'connection_terminate'};
     if (_isConnected) {
       sendToWebSocketServer(jsonEncode(disconect));
     }

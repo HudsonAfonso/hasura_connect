@@ -1,7 +1,8 @@
 import 'package:collection/collection.dart';
-import 'package:hasura_connect/hasura_connect.dart';
-import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:meta/meta.dart';
+
+import '../../../hasura_connect.dart';
+import '../models/request.dart';
 
 ///Class [Response] overrides the operator [==]
 @immutable

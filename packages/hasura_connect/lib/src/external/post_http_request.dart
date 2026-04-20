@@ -1,10 +1,11 @@
 import 'dart:convert';
 
-import 'package:hasura_connect/src/domain/entities/response.dart';
-import 'package:hasura_connect/src/domain/errors/errors.dart';
-import 'package:hasura_connect/src/domain/models/request.dart';
-import 'package:hasura_connect/src/infra/datasources/request_datasource.dart';
 import 'package:http/http.dart' as http;
+
+import '../domain/entities/response.dart';
+import '../domain/errors/errors.dart';
+import '../domain/models/request.dart';
+import '../infra/datasources/request_datasource.dart';
 
 ///Class [PostHttpRequest] implements the interface [RequestDatasource]
 ///implements the [post] method

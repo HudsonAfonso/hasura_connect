@@ -1,5 +1,3 @@
-library hasura_connect;
-
 export 'src/core/interceptors/interceptor.dart';
 export 'src/core/interceptors/log_interceptor.dart';
 export 'src/domain/entities/response.dart';

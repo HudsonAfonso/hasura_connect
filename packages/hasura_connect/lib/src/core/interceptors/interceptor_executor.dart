@@ -1,9 +1,9 @@
-import 'package:hasura_connect/src/core/interceptors/interceptor.dart';
-import 'package:hasura_connect/src/domain/entities/response.dart';
-import 'package:hasura_connect/src/domain/entities/snapshot.dart';
-import 'package:hasura_connect/src/domain/errors/errors.dart';
-import 'package:hasura_connect/src/domain/models/request.dart';
-import 'package:hasura_connect/src/presenter/hasura_connect_base.dart';
+import '../../domain/entities/response.dart';
+import '../../domain/entities/snapshot.dart';
+import '../../domain/errors/errors.dart';
+import '../../domain/models/request.dart';
+import '../../presenter/hasura_connect_base.dart';
+import 'interceptor.dart';
 
 ///The class [InterceptorExecutor] is responsible for executing the Interceptors
 class InterceptorExecutor {
@@ -28,11 +28,11 @@ class InterceptorExecutor {
     }
 
     switch (resolver.type) {
-      case Request:
+      case Request _:
         return _executeRequestInterceptors(resolver.value, resolver.connect);
-      case Response:
+      case Response _:
         return _executeResponseInterceptors(resolver.value, resolver.connect);
-      case HasuraError:
+      case HasuraError _:
         return _executeHasuraErrorInterceptors(
           resolver.value,
           resolver.connect,
